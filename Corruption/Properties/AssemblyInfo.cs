@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Corruption")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Goodies for TShock Plugins.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Corruption")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("0b14c5cb-8924-4526-b157-aec7c5ff060e")]
+[assembly: Guid("be70224b-39c2-4274-bff6-4096fa664857")]
 
 // Version information for an assembly consists of the following four values:
 //
