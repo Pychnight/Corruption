@@ -61,5 +61,8 @@
     <Compile Include="TileFunctions.cs" />
     <Compile Include="TimeFunctions.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Corruption.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
