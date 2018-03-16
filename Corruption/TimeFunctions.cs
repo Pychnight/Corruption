@@ -33,6 +33,24 @@ namespace Corruption
 			return NPC.downedPlantBoss;
 		}
 
+		internal static TimeSpan GetTimeOfDay()
+		{
+			//ripped from tshocks /time command...
+			double num = Main.time / 3600.0;
+			num += 4.5;
+			if( !Main.dayTime )
+			{
+				num += 15.0;
+			}
+			num %= 24.0;
+
+			var hour = (int)Math.Floor(num);
+			var min = (int)Math.Round(num % 1.0 * 60.0);
+			var ts = new TimeSpan(0, hour, min, 0, 0);
+
+			return ts;
+		}
+
 		/// <summary>
 		/// Returns whether the current Terraria time is within min and max.
 		/// </summary>
@@ -42,7 +60,7 @@ namespace Corruption
 		/// <remarks>Min and max are both inclusive.</remarks>
 		public static bool DuringTime(string min, string max)
 		{
-			var timeOfDay = PlayerFunctions.GetTimeOfDay();
+			var timeOfDay = GetTimeOfDay();
 
 			if( !TimeSpan.TryParse(min, out var minTime) )
 				return false;

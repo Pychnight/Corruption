@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\AllPlugins\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OTAPI">
       <HintPath>..\refs\OTAPI.dll</HintPath>
       <Private>False</Private>
@@ -57,12 +60,17 @@
     <Compile Include="EmoteFunctions.cs" />
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
+    <Compile Include="PluginSupport\JsonConfigLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TileFunctions.cs" />
     <Compile Include="TimeFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Corruption.nuspec" />
+    <None Include="Corruption.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
