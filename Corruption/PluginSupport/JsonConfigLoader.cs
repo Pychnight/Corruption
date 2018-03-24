@@ -63,14 +63,22 @@ namespace Corruption.PluginSupport
 			try
 			{
 				Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-
-				var json = JsonConvert.SerializeObject(config, Formatting.Indented);
-				File.WriteAllText(filePath, json);
+				config.Save(filePath);				
 			}
 			catch( Exception ex)
 			{
 				ServerApi.LogWriter.PluginWriteLine(plugin, ex.Message, TraceLevel.Error);
 			}
+		}
+
+		/// <summary>
+		/// Saves the JsonConfig to disk using the given file path. For specialized configs, this method may be overridden to create custom implementations.
+		/// </summary>
+		/// <param name="filePath">Filepath on disk.</param>
+		public virtual void Save(string filePath)
+		{
+			var json = JsonConvert.SerializeObject(this, Formatting.Indented);
+			File.WriteAllText(filePath, json);
 		}
 
 		/// <summary>
