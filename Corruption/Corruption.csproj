@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-   <!--  <OutputPath>bin\Debug\</OutputPath> -->
+    <!--  <OutputPath>bin\Debug\</OutputPath> -->
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -65,6 +65,7 @@
     <Compile Include="PlayerFunctions.cs" />
     <Compile Include="PluginSupport\IValidator.cs" />
     <Compile Include="PluginSupport\JsonConfigLoader.cs" />
+    <Compile Include="PluginSupport\PluginExtensions.cs" />
     <Compile Include="PluginSupport\ValidationResult.cs" />
     <Compile Include="PluginSupport\ValidationResultItem.cs" />
     <None Include="PluginSupport\ValidationResultType.cs" />
