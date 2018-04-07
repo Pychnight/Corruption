@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -32,7 +33,7 @@ namespace Corruption
 			var region = GetRegion(name);
 			return region != null && region.InArea((int)x, (int)y);
 		}
-
+		
 		// Utility public static bool for spawning at the cavern level.
 		public static bool AtCavernLevel(TSPlayer player)
 		{
@@ -67,6 +68,27 @@ namespace Corruption
 		public static bool InAndAroundRegion(TSPlayer player, float x, float y, string name)
 		{
 			return InRegion(player, name) && AroundRegion((int)x, (int)y, name);
+		}
+
+		// Utility for determining if the given tile is within a 10 tile radius of the spawn point.
+		public static bool InSpawn(int tileX, int tileY)
+		{
+			var spx = Main.spawnTileX;
+			var spy = Main.spawnTileY;
+
+			if( tileX < spx - 10 )
+				return false;
+
+			if( tileX > spx + 10 )
+				return false;
+
+			if( tileY < spy - 10 )
+				return false;
+
+			if( tileY > spy + 10 )
+				return false;
+
+			return true;
 		}
 
 		// Utility public static bool for spawning in a beach biome.
