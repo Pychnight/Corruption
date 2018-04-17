@@ -194,67 +194,67 @@ namespace Corruption
 		}
 
 		/// <summary>
-		/// Returns whether the player has any of the supplied permissions.
+		/// Returns whether the player has all of the supplied permissions.
 		/// </summary>
-		/// <param name="player"></param>
-		/// <param name="permissions"></param>
+		/// <param name="player">TSPlayer instance.</param>
+		/// <param name="permissions">String params, or array of permission strings.</param>
 		/// <returns></returns>
 		public static bool PlayerHasPermission(TSPlayer player, params string[] permissions)
 		{
 			if(permissions==null || permissions.Length < 1 )
 				return false;
-			
-			try
-			{
-				foreach( var perm in permissions )
-				{
-					if( perm!=null && player.HasPermission(perm) )
-						return true;
-				}
 
+			if( player == null )
 				return false;
-			}
-			catch
+
+			foreach( var perm in permissions )
 			{
-				return false;
+				if( perm != null && player?.HasPermission(perm) != true )
+					return false;
 			}
+
+			return true;
 		}
 
 		/// <summary>
-		/// Returns whether the player is part of any of the named groups.
+		/// Returns whether the player is part of the named groups.
 		/// </summary>
-		/// <param name="player"></param>
-		/// <param name="groups"></param>
-		/// <returns></returns>
+		/// <param name="player">TSPlayer instance.</param>
+		/// <param name="group">Group name string.</param>
+		/// <returns>True on success, false otherwise.</returns>
+		public static bool PlayerHasGroup(TSPlayer player, string group)
+		{
+			var playerGroup = player.Group;
+
+			while( playerGroup != null )
+			{
+				if( playerGroup.Name == group )
+					return true;
+
+				playerGroup = playerGroup.Parent;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Returns whether the player is part of all of the named groups.
+		/// </summary>
+		/// <param name="player">TSPlayer instance.</param>
+		/// <param name="groups">Group name strings, as params or an array.</param>
+		/// <returns>True on success, false otherwise.</returns>
 		public static bool PlayerHasGroup(TSPlayer player, params string[] groups)
 		{
 			if( groups == null || groups.Length < 1 )
 				return false;
-
-			try
+			
+			foreach(var g in groups)
 			{
-				var playerGroup = player.Group;
-
-				while( playerGroup != null )
-				{
-					foreach( var group in groups )
-					{
-						if( group != null )
-						{
-							if( playerGroup.Name == group )
-								return true;
-						}
-					}
-
-					playerGroup = playerGroup.Parent;
-				}
-
-				return false;
+				if( g!=null && !PlayerHasGroup(player, g) )
+					return false;
 			}
-			catch
-			{
-				return false;
-			}
+
+			return true;
 		}
 	}
 }
