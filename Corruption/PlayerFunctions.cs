@@ -15,6 +15,46 @@ namespace Corruption
 {
 	public static class PlayerFunctions
 	{
+		/// <summary>
+		///		Broadcasts the specified message.
+		/// </summary>
+		/// <param name="message">The message string.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="message" /> is <c>null</c>.</exception>
+		public static void Broadcast(string message)
+		{
+			Broadcast(message, Color.White);
+		}
+
+		/// <summary>
+		///     Broadcasts the specified message.
+		/// </summary>
+		/// <param name="message">The message, which must not be <c>null</c>.</param>
+		/// <param name="color">The color.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="message" /> is <c>null</c>.</exception>
+		public static void Broadcast( string message, Color color)
+		{
+			if( message == null )
+				throw new ArgumentNullException(nameof(message));
+			
+			TShock.Utils.Broadcast(message, color);
+		}
+
+		/// <summary>
+		///     Broadcasts the specified message.
+		/// </summary>
+		/// <param name="message">The message, which must not be <c>null</c>.</param>
+		/// <param name="r">The red component.</param>
+		/// <param name="g">The green component.</param>
+		/// <param name="b">The blue component.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="message" /> is <c>null</c>.</exception>
+		public static void Broadcast( string message, byte r, byte g, byte b)
+		{
+			if( message == null )
+				throw new ArgumentNullException(nameof(message));
+			
+			TShock.Utils.Broadcast(message, r, g, b);
+		}
+
 		//we stripped attacker from calling functions for now, but in case it gets readded again later we keep it.
 		static PlayerDeathReason createPlayerDeathReason(object attacker, string reason)
 		{
