@@ -1,14 +1,83 @@
-﻿using System;
+﻿//#define USE_FAST_ID_LOOKUP
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using TShockAPI.Localization;
 
 namespace Corruption
 {
 	public static class NpcFunctions
 	{
+#if USE_FAST_ID_LOOKUP
+
+		static Dictionary<string, int> npcNameToId;
+
+		static NpcFunctions()
+		{
+			//generate dict for fast lookups of id's 
+			npcNameToId = new Dictionary<string, int>();
+			for( var i = -65; i < Main.maxNPCTypes; ++i )
+			{
+				var npcName = EnglishLanguage.GetNpcNameById(i);
+				if(npcName!=null)
+				{
+					var lower = npcName.ToLower();
+					npcNameToId.Add(lower, i);
+				}
+			}
+		}
+		
+		static int? getNpcTypeFromNameImpl(string name)
+		{
+			var lower = name.ToLower();
+
+			if(npcNameToId.TryGetValue(lower,out var result))
+				return result;
+			else
+				return null;
+		}
+
+#else
+
+		static int? getNpcTypeFromNameImpl(string name)
+		{
+			for( var i = -65; i < Main.maxNPCTypes; ++i )
+			{
+				var npcName = EnglishLanguage.GetNpcNameById(i);
+				if( npcName?.Equals(name, StringComparison.OrdinalIgnoreCase) ?? false )
+				{
+					return i;
+				}
+			}
+
+			return null;
+		}
+
+#endif
+
+		public static int? GetNpcTypeFromName(string name)
+		{
+			if( string.IsNullOrWhiteSpace(name) )
+				return null;
+
+			return getNpcTypeFromNameImpl(name);
+		}
+				
+		public static int? GetNpcTypeFromNameOrType(string nameOrType)
+		{
+			if( string.IsNullOrWhiteSpace(nameOrType) )
+				return null;
+						
+			if( int.TryParse(nameOrType, out var id) && -65 <= id && id < Main.maxNPCTypes )
+				return id;
+
+			return getNpcTypeFromNameImpl(nameOrType);
+		}
+		
 		/// <summary>
 		/// Counts the number of NPCs in the area matching the name. (Uses GivenOrTypeName)
 		/// </summary>
