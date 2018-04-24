@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="AreaFunctions.cs" />
     <Compile Include="EmoteFunctions.cs" />
+    <Compile Include="ItemFunctions.cs" />
     <Compile Include="NpcFunctions.cs" />
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />

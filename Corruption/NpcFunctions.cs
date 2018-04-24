@@ -43,6 +43,7 @@ namespace Corruption
 
 #else
 
+		//id should really be called type -- ugh @ terraria
 		static int? getNpcTypeFromNameImpl(string name)
 		{
 			for( var i = -65; i < Main.maxNPCTypes; ++i )
@@ -59,7 +60,7 @@ namespace Corruption
 
 #endif
 
-		public static int? GetNpcTypeFromName(string name)
+		public static int? GetNpcIdFromName(string name)
 		{
 			if( string.IsNullOrWhiteSpace(name) )
 				return null;
@@ -67,7 +68,7 @@ namespace Corruption
 			return getNpcTypeFromNameImpl(name);
 		}
 				
-		public static int? GetNpcTypeFromNameOrType(string nameOrType)
+		public static int? GetNpcIdFromNameOrType(string nameOrType)
 		{
 			if( string.IsNullOrWhiteSpace(nameOrType) )
 				return null;
