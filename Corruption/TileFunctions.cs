@@ -127,12 +127,35 @@ namespace Corruption
 		}
 
 		/// <summary>
-		///     Gets the tile at the specified coordinates.
+		///     Gets the tile located at the specified coordinates.
 		/// </summary>
-		/// <param name="x">The X coordinate, which must be in bounds.</param>
-		/// <param name="y">The Y coordinate, which must be in bounds.</param>
+		/// <param name="x">The X coordinate, which must be within the bounds of the world.</param>
+		/// <param name="y">The Y coordinate, which must be within the bounds of the world.</param>
 		/// <returns>The tile.</returns>
 		public static ITile GetTile(int x, int y) => Main.tile[x, y];
+
+		/// <summary>
+		///     Gets the type of the specified tile.
+		/// </summary>
+		/// <param name="tile">The tile, which must not be <c>null</c>.</param>
+		/// <returns>The type.</returns>
+		/// <remarks>
+		///     This method is required since we can't get the type property in Lua since it is an unsigned short.
+		/// </remarks>
+		public static int GetTileType(ITile tile) => tile.type;
+
+		/// <summary>
+		///     Sets the type of the specified tile.
+		/// </summary>
+		/// <param name="tile">The tile, which must not be <c>null</c>.</param>
+		/// <param name="type">The type.</param>
+		/// <remarks>
+		///     This method is required, since we can't set the type property in Lua since it is an unsigned short.
+		/// </remarks>
+		public static void SetTileType(ITile tile, int type)
+		{
+			tile.type = (ushort)type;
+		}
 
 		//
 		//public static bool SolidTile(ITile tile)
@@ -155,8 +178,7 @@ namespace Corruption
 			var tile = GetTile(column, row);
 			return tile.wall > 0;
 		}
-
-
+		
 		public static bool IsLiquidTile(int column, int row)
 		{
 			var tile = GetTile(column, row);
@@ -298,7 +320,8 @@ namespace Corruption
 			{ 
 				for( var j = minY; j<= maxY; j++)
 				{
-					if( MatchesBlock(i, j, id)) //script error? no overload exists for 5 args -->  frameX, frameY) )
+					//if( MatchesBlock(i, j, id)) //script error? no overload exists for 5 args -->  frameX, frameY) )
+					if( MatchesBlockWithFrames(i, j, id, frameX, frameY) ) //script error? no overload exists for 5 args -->  frameX, frameY) )
 						count = count + 1;
 				}
 			}
@@ -325,38 +348,34 @@ namespace Corruption
 			return count;
 		}
 
-		// Determines if the block at the coordinates matches the ID. (Replaced in Corruption.TileFunctions. )
+		// Determines if the block at the coordinates matches the ID. ( From CustomQuests utils.lua )
 		public static bool MatchesBlock(int x, int y, object id)
 		{
-			throw new NotImplementedException("development stub. id may be int or string, fix.");
-
+			var stringId = id as string;
 			var tile = GetTile(x, y);
 
-			if( id == "air" )
+			if( stringId == "air" )
 				return !tile.active() && tile.liquid == 0;
-			else if( id == "water" )
+			else if( stringId == "water" )
 				return !tile.active() && tile.liquid > 0 && tile.liquidType() == 0;
-			else if( id == "lava" )
+			else if( stringId == "lava" )
 				return !tile.active() && tile.liquid > 0 && tile.liquidType() == 1;
-			else if( id == "honey" )
+			else if( stringId == "honey" )
 				return !tile.active() && tile.liquid > 0 && tile.liquidType() == 2;
-
-			//FIXME!!! below needs to be uncommented after we sort typing in this method.
-			//else
-			//	return tile.active() && GetTileType(tile) == id;
-
-			//remove line below..
-			return false;
+			else if( id is int )
+				return tile.active() && GetTileType(tile) == (int)id;
+			else
+				return false;
 		}
 
-		// Determines if the block at the coordinates matches the ID and frames. (Replaced in Corruption.TileFunctions. )
+		// Determines if the block at the coordinates matches the ID and frames. (from CustomQuests utils.lua )
 		public static bool MatchesBlockWithFrames(int x, int y, int id, int frameX, int frameY)
 		{
 			var tile = GetTile(x, y);
 			return tile.active() && GetTileType(tile) == id && tile.frameX == frameX && tile.frameY == frameY;
 		}
 
-		// Determines if the wall at the coordinates matches the ID. (Replaced in Corruption.TileFunctions. )
+		// Determines if the wall at the coordinates matches the ID. ( from CustomQuests utils.lua )
 		public static bool MatchesWall(int x, int y, int id)
 		{
 			var tile = GetTile(x, y);
@@ -364,46 +383,48 @@ namespace Corruption
 		}
 
 		// Sets the block at the coordinates to the ID.
-		public static void SetBlock(int x, int y, string id)
+		public static void SetBlock(int x, int y, object id)
 		{
+			var stringId = id as string;
+
 			var tile = GetTile(x, y);
-			if( id == "air" )
+			if( stringId == "air" )
 			{
 				tile.active(false);
 				tile.liquid = 0;
 				tile.type = 0;
 			}
-			else if( id == "water" )
+			else if( stringId == "water" )
 			{
 				tile.active(false);
 				tile.liquid = 255;
 				tile.liquidType(0);
 				tile.type = 0;
 			}
-			else if( id == "lava")
+			else if( stringId == "lava")
 			{
 				tile.active(false);
 				tile.liquid = 255;
 				tile.liquidType(1);
 				tile.type = 0;
 			}
-			else if( id == "honey")
+			else if( stringId == "honey")
 			{
 				tile.active(false);
 				tile.liquid = 255;
 				tile.liquidType(2);
 				tile.type = 0;
 			}
-			else
+			else if(id is int)
 			{ 
 				tile.active(true);
 				tile.liquid = 0;
-				SetTileType(tile, id);
+				SetTileType(tile, (int)id);
 			}
 		}
 
 		// Sets the blocks in the area.
-		public static void SetBlocks(int x, int y, int x2, int y2, string id)
+		public static void SetBlocks(int x, int y, int x2, int y2, object id)
 		{
 			var minX = Math.Min(x, x2);
 			var maxX = Math.Max(x, x2);
@@ -417,7 +438,7 @@ namespace Corruption
 				}
 			}
 		}
-
+		
 		// Sets the walls at the coordinates.
 		public static void SetWall(int x, int y, int id)
 		{
@@ -439,17 +460,6 @@ namespace Corruption
 					SetWall(i, j, id);
 				}
 			}
-		}
-
-		private static void SetTileType(object tile, object id)
-		{
-			throw new NotImplementedException("development stub.");
-		}
-
-		private static int GetTileType(ITile tile)
-		{
-			throw new NotImplementedException("development stub.");
-			return 0;
 		}
 	}
 }
