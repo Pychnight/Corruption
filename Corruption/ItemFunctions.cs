@@ -66,6 +66,9 @@ namespace Corruption
 			if( chestId != -1 )
 			{
 				TSPlayer.All.SendData((PacketTypes)34, "", 0, x, y, style, chestId);
+
+				//var fx = Main.tile[x, y].frameX;
+				//Debug.Print($"FrameX: {fx}");
 			}
 		}
 
@@ -119,6 +122,55 @@ namespace Corruption
 			}
 
 			PutItemIntoChest(x, y, (int)id, stack, prefix);
+		}
+
+		/// <summary>
+		///		Counts the quantiy of the specified Item that are in the Chest.
+		/// </summary>
+		/// <param name="x">Chest X location in tile coords.</param>
+		/// <param name="y">Chest Y location in tile coords.</param>
+		/// <param name="itemId">Item id.</param>
+		/// <param name="prefix">Item prefix.</param>
+		/// <returns>Total Item count.</returns>
+		public static int CountChestItem(int x, int y, int itemId, byte prefix = 0)
+		{
+			var chestId = Chest.FindChest(x, y - 1);
+			if( chestId == -1 )
+			{
+				return 0;
+			}
+
+			var count = 0;
+			var chest = Main.chest[chestId];
+			for( var i = 0; i < Chest.maxItems; i++ )
+			{
+				var item = chest.item[i];
+				if( item.netID == itemId && item.prefix == prefix )
+				{
+					//Debug.Print($"Stack: {item.stack}");
+					count += item.stack;
+				}
+			}
+
+			return count;
+		}
+
+		/// <summary>
+		///		Counts the quantiy of the specified Item that are in the Chest.
+		/// </summary>
+		/// <param name="x">Chest X location in tile coords.</param>
+		/// <param name="y">Chest Y location in tile coords.</param>
+		/// <param name="itemType">Item name.</param>
+		/// <param name="prefix">Item prefix.</param>
+		/// <returns>Total Item count.</returns>
+		public static int CountChestItem(int x, int y, string itemType, byte prefix = 0)
+		{
+			var id = ItemFunctions.GetItemIdFromName(itemType);
+
+			if( id == null )
+				return 0;
+
+			return CountChestItem(x, y, (int)id, prefix);
 		}
 	}
 }
