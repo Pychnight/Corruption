@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using TShockAPI;
+using TShockAPI.DB;
 
 namespace Corruption
 {
@@ -382,6 +383,40 @@ namespace Corruption
 			return tile.type == id;
 		}
 
+		public static void ClearBlock(int x, int y)
+		{
+			if( Main.tile[x, y]?.active() == true )
+			{
+				WorldGen.KillTile(x, y);
+			}
+		}
+
+		// Sets the blocks in the area.
+		public static void ClearBlocks(int x, int y, int x2, int y2)
+		{
+			var minX = Math.Min(x, x2);
+			var maxX = Math.Max(x, x2);
+			var minY = Math.Min(y, y2);
+			var maxY = Math.Max(y, y2);
+			for( var i = minX; i <= maxX; i++ )
+			{
+				for( var j = minY; j <= maxY; j++ )
+				{
+					ClearBlock(i, j);
+				}
+			}
+		}
+
+		public static void ClearBlocks(Rectangle rect)
+		{
+			ClearBlocks(rect.Left, rect.Top, rect.Right, rect.Bottom);
+		}
+
+		public static void ClearBlocks(Region region)
+		{
+			ClearBlocks(region.Area);
+		}
+
 		// Sets the block at the coordinates to the ID.
 		public static void SetBlock(int x, int y, object id)
 		{
@@ -437,6 +472,16 @@ namespace Corruption
 					SetBlock(i, j, id);
 				}
 			}
+		}
+
+		public static void SetBlocks(Rectangle rect, object id)
+		{
+			SetBlocks(rect.Left, rect.Top, rect.Right, rect.Bottom, id);
+		}
+
+		public static void SetBlocks(Region region, object id)
+		{
+			SetBlocks(region.Area, id);
 		}
 		
 		// Sets the walls at the coordinates.
