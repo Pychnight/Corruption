@@ -66,6 +66,9 @@
     <Compile Include="NpcFunctions.cs" />
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
+    <Compile Include="Types\InventoryGroup.cs" />
+    <Compile Include="Types\InventorySlot.cs" />
+    <Compile Include="Types\PlayerInventoryManager.cs" />
     <Compile Include="PluginSupport\IValidator.cs" />
     <Compile Include="PluginSupport\JsonConfigLoader.cs" />
     <Compile Include="PluginSupport\PluginExtensions.cs" />
