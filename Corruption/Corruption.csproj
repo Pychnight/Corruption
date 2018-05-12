@@ -66,6 +66,7 @@
     <Compile Include="NpcFunctions.cs" />
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
+    <Compile Include="SignTypes.cs" />
     <Compile Include="Types\InventoryGroup.cs" />
     <Compile Include="Types\InventorySlot.cs" />
     <Compile Include="Types\PlayerInventoryManager.cs" />

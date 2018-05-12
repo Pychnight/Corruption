@@ -506,5 +506,30 @@ namespace Corruption
 				}
 			}
 		}
+
+		public static bool CreateSign(int x, int y, int type)
+		{
+			var style = 0;
+			var result = WorldGen.PlaceSign(x, y + 1, (ushort)type, style);
+
+			TSPlayer.All.SendTileSquare(x, y);
+
+			return result;
+		}
+
+		public static bool CreateSign(int x, int y, SignTypes type)
+		{
+			return CreateSign(x, y, (int)type);
+		}
+
+		public static bool CreateSign(int x, int y)
+		{
+			return CreateSign(x, y, (int)SignTypes.Sign);
+		}
+
+		public static void KillSign(int x, int y)
+		{
+			KillTile(x, y);
+		}
 	}
 }
