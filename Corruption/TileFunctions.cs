@@ -510,11 +510,27 @@ namespace Corruption
 		public static bool CreateSign(int x, int y, int type)
 		{
 			var style = 0;
-			var result = WorldGen.PlaceSign(x, y + 1, (ushort)type, style);
 
-			TSPlayer.All.SendTileSquare(x, y);
+			var newSignSlot = FindEmptySignSlot();
 
-			return result;
+			if( newSignSlot > -1 )
+			{
+				var result = WorldGen.PlaceSign(x, y + 1, (ushort)type, style);
+
+				if( result )
+				{
+					Main.sign[newSignSlot] = new Sign();
+					Main.sign[newSignSlot].x = x;
+					Main.sign[newSignSlot].y = y;
+					Main.sign[newSignSlot].text = "";
+
+					TSPlayer.All.SendTileSquare(x, y);
+				}
+
+				return result;
+			}
+
+			return false;
 		}
 
 		public static bool CreateSign(int x, int y, SignTypes type)
@@ -529,7 +545,47 @@ namespace Corruption
 
 		public static void KillSign(int x, int y)
 		{
+			Sign.KillSign(x, y);
+
 			KillTile(x, y);
+		}
+
+		public static void SetSignText(int x, int y, string txt)
+		{
+			var id = FindSignId(x, y);
+
+			if(id>-1)
+			{
+				Sign.TextSign(id, txt);
+
+				TSPlayer.All.SendTileSquare(x, y);
+			}
+		}
+
+		internal static int FindSignId(int x, int y)
+		{
+			for( int i = 0; i < 1000; i++ )
+			{
+				if( Main.sign[i] != null && Main.sign[i].x == x && Main.sign[i].y == y )
+				{
+					return i;
+				}
+			}
+
+			return -1;
+		}
+
+		internal static int FindEmptySignSlot()
+		{
+			for( int i = 0; i < 1000; i++ )
+			{
+				if( Main.sign[i] == null )
+				{
+					return i;
+				}
+			}
+
+			return -1;
 		}
 	}
 }
