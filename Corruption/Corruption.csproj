@@ -67,6 +67,7 @@
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
     <Compile Include="PluginSupport\OutputExtensions.cs" />
+    <Compile Include="ProjectileFunctions.cs" />
     <Compile Include="SignTypes.cs" />
     <Compile Include="Types\InventoryGroup.cs" />
     <Compile Include="Types\InventorySlot.cs" />
