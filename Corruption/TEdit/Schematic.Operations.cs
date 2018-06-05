@@ -12,65 +12,57 @@ namespace Corruption.TEdit
 {
 	public partial class Schematic
 	{
-		public Rectangle TileBounds => new Rectangle(0, 0, Width, Height);
-
 		public void Paste(int x, int y)
 		{
 			//clip
 			var worldRect = new Rectangle(0, 0, Main.maxTilesX, Main.maxTilesY);
 			var schematicRect = new Rectangle(x, y, Width, Height);
-			var clipRect = schematicRect;
+			var clippedRect = schematicRect;
 
-			worldRect.Intersects(ref schematicRect, out var intersects);
+			worldRect.Intersects(ref clippedRect, out var intersects);
 
 			if( !intersects )
 				return;
 
-			//int columnMin	= Math.Max(0, x);
-			//int rowMin		= Math.Max(0, y);
-			//int columnMax	= Math.Min(worldRect.Right - 1, x + Width);
-			//int rowMax		= Math.Min(worldRect.Bottom - 1, y + Height);
-
 			//starting position within schematic to read from.
-			var readColumnStart = clipRect.Left - x;
-			var readRowStart = clipRect.Top - y;
+			var readColumnStart = clippedRect.Left - x;
+			var readRowStart = clippedRect.Top - y;
 
 			var readRow = readRowStart;
 
-			for( var row = clipRect.Top; row < clipRect.Bottom; row++ )
+			for( var row = clippedRect.Top; row < clippedRect.Bottom; row++ )
 			{
 				var readColumn = readColumnStart;
 
-				for( var column = clipRect.Left; column < clipRect.Right; column++ )
+				for( var column = clippedRect.Left; column < clippedRect.Right; column++ )
 				{
 					var readTile = Tiles[readColumn, readRow];
-
 					//TileFunctions.SetTile(column, row, 1);
-
-					//if(Main.tile[column,row]==null)
-					//{
-					//	Debugger.Break();
-					//}
-
+					
 					//Main.tile[column, row].ResetToType(readTile.Type);
 					Main.tile[column, row].CopyFrom(readTile);
-					TSPlayer.All.SendTileSquare(column, row);
-
-					//wall 
-
-					//tile
-					//if( Main.tile[column, row]?.active() == true )
-					{
-						//Main.tile[column, row].ResetToType((ushort)type);
-						//TSPlayer.All.SendTileSquare(column, row);
-					}
-
-
+					//TSPlayer.All.SendTileSquare(column, row, 1);
+										
 					readColumn++;
 				}
 
 				readRow++;
 			}
+
+			//try to send update, using the pasted schematics center point, and radius
+			SendTileSquare(TSPlayer.All, ref clippedRect);
+		}
+
+		//should we expose this publicly?
+		internal static void SendTileSquare(TSPlayer player, ref Rectangle rectangle )
+		{
+			//try to send update, using the pasted schematics center point, and radius
+			var updateX = rectangle.Center.X;
+			var updateY = rectangle.Center.Y;
+			var updateSize = rectangle.Width > rectangle.Height ? rectangle.Width : rectangle.Height;
+
+			TSPlayer.All.SendTileSquare(updateX, updateY, updateSize);
+			//TSPlayer.All.SendData(PacketTypes.TileSendSquare, "", updateSize, updateX, updateY, 0, 0);
 		}
 	}
 }
