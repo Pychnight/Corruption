@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 namespace Corruption.TEdit
 {
-	public class Schematic
+	public partial class Schematic
 	{
 		public string Name { get; set; }
 		public int Width { get; set; }
 		public int Height { get; set; }
-
 		public Tile[,] Tiles { get; set; } // = new Tile[8,8];
-
 		public List<Chest> Chests { get; set; } = new List<Chest>();
 		public List<Sign> Signs  { get; set; } = new List<Sign>();
 
@@ -45,7 +43,8 @@ namespace Corruption.TEdit
 					if( version < 78 )
 					{
 						//return Load5(b, name, tVersion, version);
-						return new SchematicReaderV5().Read(b, name, version);
+						var sch = new SchematicReaderV5().Read(b, name, version);
+						return sch;
 					}
 					//else if( version == 4 )
 					//{
@@ -75,7 +74,7 @@ namespace Corruption.TEdit
 					{
 						// not and old version, use new version
 						//return LoadV2(b, name, tVersion, version);
-						var sch = LoadV2(b, name, (uint)version, version);
+						var sch = new SchematicReaderV2().Read(b, name, version); 
 						return sch;
 					}
 				}
@@ -89,36 +88,5 @@ namespace Corruption.TEdit
 			
 			return null;
 		}
-
-		private static Schematic LoadV2(BinaryReader b, string name, uint tVersion, int version)
-		{
-			int sizeX = b.ReadInt32();
-			int sizeY = b.ReadInt32();
-			//var buffer = new ClipboardBuffer(new Vector2Int32(sizeX, sizeY));
-			var sch = new Schematic(sizeX, sizeY);
-			
-			sch.Name = name;
-
-			sch.Tiles = World.LoadTileData(b, sizeX, sizeY);
-			sch.Chests.AddRange(World.LoadChestData(b));
-			sch.Signs.AddRange(World.LoadSignData(b));
-			
-			string verifyName = b.ReadString();
-			int verifyVersion = b.ReadInt32();
-			int verifyX = b.ReadInt32();
-			int verifyY = b.ReadInt32();
-			if( sch.Name == verifyName &&
-				version == verifyVersion &&
-				sch.Width == verifyX &&
-				sch.Height == verifyY )
-			{
-				// valid;
-				return sch;
-			}
-			b.Close();
-
-			return null;
-		}
-
 	}
 }

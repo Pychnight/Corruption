@@ -7,24 +7,15 @@ using System.Threading.Tasks;
 
 namespace Corruption.TEdit
 {
-	public abstract class SchematicReader
-	{
-		public abstract Schematic Read(BinaryReader reader, string name, int version);
-	}
-
 	public class SchematicReaderV5 : SchematicReader
 	{
 		public override Schematic Read(BinaryReader b, string name, int version)
 		{
-			uint tVersion = (uint)version;
-
-			int sizeX = b.ReadInt32();
-			int sizeY = b.ReadInt32();
-			//var buffer = new ClipboardBuffer(new Vector2Int32(sizeX, sizeY));
-			//buffer.Name = name;
-
+			var tVersion = (uint)version;
+			var sizeX = b.ReadInt32();
+			var sizeY = b.ReadInt32();
 			var schematic = new Schematic(sizeX, sizeY, name);
-		
+
 			for( int x = 0; x < sizeX; ++x )
 			{
 				for( int y = 0; y < sizeY; y++ )
