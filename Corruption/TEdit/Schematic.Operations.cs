@@ -12,6 +12,11 @@ namespace Corruption.TEdit
 {
 	public partial class Schematic
 	{
+		/// <summary>
+		/// Pastes a Schematic into the world.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
 		public void Paste(int x, int y)
 		{
 			//clip
@@ -37,9 +42,6 @@ namespace Corruption.TEdit
 				for( var column = clippedRect.Left; column < clippedRect.Right; column++ )
 				{
 					var readTile = Tiles[readColumn, readRow];
-					//TileFunctions.SetTile(column, row, 1);
-					
-					//Main.tile[column, row].ResetToType(readTile.Type);
 					Main.tile[column, row].CopyFrom(readTile);
 					//TSPlayer.All.SendTileSquare(column, row, 1);
 										
@@ -51,6 +53,90 @@ namespace Corruption.TEdit
 
 			//try to send update, using the pasted schematics center point, and radius
 			SendTileSquare(TSPlayer.All, ref clippedRect);
+		}
+		
+		/// <summary>
+		/// Creates a Schematic, from existing tiles in the world. 
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="columns"></param>
+		/// <param name="rows"></param>
+		/// <returns></returns>
+		public static Schematic Grab(int x, int y, int columns, int rows)
+		{
+			//clip
+			var worldRect = new Rectangle(0, 0, Main.maxTilesX, Main.maxTilesY);
+			var schematicRect = new Rectangle(x, y, columns, rows);
+			var clippedRect = schematicRect;
+
+			worldRect.Intersects(ref clippedRect, out var intersects);
+
+			var result = new Schematic(clippedRect.Width,clippedRect.Height);
+
+			result.IsGrabbed = true;
+			result.GrabbedX = clippedRect.Left;
+			result.GrabbedY = clippedRect.Top;
+
+			if( !intersects )
+				return result;
+
+			//starting position within schematic to read from.
+			var writeColumnStart = clippedRect.Left - x;
+			var writeRowStart = clippedRect.Top - y;
+
+			var writeRow = writeRowStart;
+
+			for( var row = clippedRect.Top; row < clippedRect.Bottom; row++ )
+			{
+				var writeColumn = writeColumnStart;
+
+				for( var column = clippedRect.Left; column < clippedRect.Right; column++ )
+				{
+					//var readTile = Tiles[readColumn, readRow];
+					var itile = Main.tile[column, row];
+					var tile = new Tile();
+
+					tile.CopyFrom(itile);
+					result.Tiles[writeColumn, writeRow] = tile;
+
+					writeColumn++;
+				}
+
+				writeRow++;
+			}
+
+			//chests
+
+			//signs
+
+			return result;
+		}
+
+		/// <summary>
+		/// Used to replace modified tiles after Paste operations.
+		/// </summary>
+		public void Restore()
+		{
+			if( IsGrabbed )
+			{
+				Paste(GrabbedX, GrabbedY);
+			}
+		}
+		
+		/// <summary>
+		/// Shortcut that combines Grab() and Paste() into a single method.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		public Schematic GrabPaste(int x, int y)
+		{
+			var grabbed = Grab(x, y, Width, Height);
+
+			Paste(x, y);
+
+			return grabbed;
 		}
 
 		//should we expose this publicly?

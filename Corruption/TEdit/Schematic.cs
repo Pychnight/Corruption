@@ -15,7 +15,10 @@ namespace Corruption.TEdit
 		public int Height { get; set; }
 		public Tile[,] Tiles { get; set; } // = new Tile[8,8];
 		public List<Chest> Chests { get; set; } = new List<Chest>();
-		public List<Sign> Signs  { get; set; } = new List<Sign>();
+		public List<Sign> Signs { get; set; } = new List<Sign>();
+		public bool IsGrabbed { get; set; }
+		public int GrabbedX { get; set; }
+		public int GrabbedY { get; set; }
 
 		public Schematic(int width, int height, string name = "schematic")
 		{
