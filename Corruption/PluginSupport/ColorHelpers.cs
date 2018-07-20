@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Terraria;
 
 namespace Corruption.PluginSupport
 {
@@ -27,6 +28,11 @@ namespace Corruption.PluginSupport
 			{
 				return Color.White;
 			}
+		}
+
+		public static string ColorText(this Color color, object obj)
+		{
+			return $"[c/{color.Hex3()}:{obj.ToString()}]";
 		}
 	}
 }
