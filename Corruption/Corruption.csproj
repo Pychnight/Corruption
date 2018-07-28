@@ -68,6 +68,7 @@
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
     <Compile Include="PluginSupport\OutputExtensions.cs" />
+    <Compile Include="PluginSupport\TileNameMap.cs" />
     <Compile Include="ProjectileFunctions.cs" />
     <Compile Include="SignTypes.cs" />
     <Compile Include="TEdit\ITileExtensions.cs" />
