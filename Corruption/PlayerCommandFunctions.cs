@@ -10,12 +10,28 @@ namespace Corruption
 {
 	public static class PlayerCommandFunctions
 	{
+		/// <summary>
+		/// Executes a command as the given TSPlayer.
+		/// </summary>
+		/// <param name="player">TSPlayer.</param>
+		/// <param name="text">Command string.</param>
+		/// <returns>Status.</returns>
 		public static bool ExecuteCommand(TSPlayer player, string text)
 		{
 			if( player == null || text == null )
 				return false;
 
 			return HandleCommand(player, text);
+		}
+
+		/// <summary>
+		/// Executes a command as TSPlayer.Server.
+		/// </summary>
+		/// <param name="text">Command string</param>
+		/// <returns>Status.</returns>
+		public static bool ExecuteCommand(string text)
+		{
+			return ExecuteCommand(TSPlayer.Server, text);
 		}
 
 		//Code below this point grabbed from TShock and modified where needed.

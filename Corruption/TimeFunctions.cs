@@ -33,7 +33,11 @@ namespace Corruption
 			return NPC.downedPlantBoss;
 		}
 
-		internal static TimeSpan GetTimeOfDay()
+		/// <summary>
+		/// Gets a TimeSpan representing the current hour and minute.
+		/// </summary>
+		/// <returns>TimeSpan</returns>
+		public static TimeSpan GetTimeOfDay()
 		{
 			//ripped from tshocks /time command...
 			double num = Main.time / 3600.0;
