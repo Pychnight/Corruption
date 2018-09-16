@@ -12,7 +12,11 @@ namespace Corruption.PluginSupport
 	{
 		public static void LogPrint(this TerrariaPlugin plugin, string message, TraceLevel kind = TraceLevel.Info )
 		{
-			ServerApi.LogWriter.PluginWriteLine(plugin, message, kind);
+			//try safeguard against occasional NREs thrown on abrupt shutdown.
+			if( plugin == null )
+				return;
+
+			ServerApi.LogWriter?.PluginWriteLine(plugin, message, kind);
 		}
 	}
 }
