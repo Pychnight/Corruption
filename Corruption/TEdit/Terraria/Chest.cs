@@ -48,7 +48,27 @@ namespace Corruption.TEdit //TEditXNA.Terraria
 			_name = name;
 		}
 
+		/// <summary>
+		/// Creates a Corruption.TEdit.Chest from a Terraria.Chest.
+		/// </summary>
+		/// <param name="tChest"></param>
+		public Chest(Terraria.Chest tChest) : this( tChest.x, tChest.y, tChest.name)
+		{
+			for( int i = 0; i < MaxItems; i++ )
+			{
+				var src = tChest.item[i];
 
+				if(src!=null)
+				{
+					var dst = _items[i];
+
+					dst.NetId = src.netID;
+					dst.Prefix = src.prefix;
+					dst.StackSize = src.stack;
+				}
+			}
+		}
+		
 		private int _x;
 		private int _y;
 
@@ -105,8 +125,8 @@ namespace Corruption.TEdit //TEditXNA.Terraria
 		//}
 
 		public string Name { get => _name; set => _name = value; }
-		public int Y { get => _x; set => _x = value; }
-		public int X { get => _y; set => _y = value; }
+		public int X { get => _x; set => _x = value; }
+		public int Y { get => _y; set => _y = value; }
 		
 		private readonly ObservableCollection<Item> _items = new ObservableCollection<Item>();
 		public ObservableCollection<Item> Items

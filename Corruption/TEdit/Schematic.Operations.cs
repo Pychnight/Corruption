@@ -33,6 +33,12 @@ namespace Corruption.TEdit
 			var readColumnStart = clippedRect.Left - x;
 			var readRowStart = clippedRect.Top - y;
 
+			//clear existing chests
+			ItemFunctions.ClearChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
+			
+			//clear signs
+
+			//copy tiles
 			var readRow = readRowStart;
 
 			for( var row = clippedRect.Top; row < clippedRect.Bottom; row++ )
@@ -52,7 +58,37 @@ namespace Corruption.TEdit
 			}
 
 			//try to send update, using the pasted schematics center point, and radius
-			SendTileSquare(TSPlayer.All, ref clippedRect);
+			SendTileUpdates(TSPlayer.All, ref clippedRect);
+
+			//paste chests
+			foreach( var chest in Chests )
+			{
+				const int frameSize = 16 + 2; //presumably, this is the frame size.
+
+				var tile = Tiles[chest.X,chest.Y];
+				var chestStyle = tile.U / frameSize;
+				var chestX = x + chest.X;
+				var chestY = y + chest.Y + 1; // we have to add 1, because create chest uses an offset.
+				var chestId = ItemFunctions.CreateChest(chestX, chestY, chestStyle);
+				
+				if( chestId != -1 )
+				{
+					foreach(var item in chest.Items)
+					{
+						ItemFunctions.PutItemIntoChest(chestId, item.NetId, item.StackSize, item.Prefix);
+					}
+				}
+				else
+				{
+					//failed to create chest for some reason, maybe one already in the way.
+					Debug.Print($"Failed to create schematic chest at {chestX}, {chestY}.");
+				}
+								
+				//This is a bug in terraria server? or tshock?
+				//PacketType 34 should be PlaceChest, not TileKill. Sigh.
+				//TSPlayer.All.SendData(PacketTypes.TileKill, "", chestId, tileX, tileY, style, 0);//0 = ChestID to destroy, but we dont use this here..
+			}
+
 		}
 		
 		/// <summary>
@@ -84,7 +120,7 @@ namespace Corruption.TEdit
 			//starting position within schematic to read from.
 			var writeColumnStart = clippedRect.Left - x;
 			var writeRowStart = clippedRect.Top - y;
-
+			
 			var writeRow = writeRowStart;
 
 			for( var row = clippedRect.Top; row < clippedRect.Bottom; row++ )
@@ -106,7 +142,23 @@ namespace Corruption.TEdit
 				writeRow++;
 			}
 
-			//chests
+			//grab chests
+			var chestIds = ItemFunctions.FindChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
+			foreach(var id in chestIds)
+			{
+				var srcChest = Main.chest[id];
+
+				if(srcChest!=null)
+				{
+					Corruption.TEdit.Chest dst = new Corruption.TEdit.Chest(srcChest);
+
+					//we have to offset dst into coords that are relative to the schematic, not the world tileset.
+					dst.X = dst.X - x;
+					dst.Y = dst.Y - y;
+
+					result.Chests.Add(dst);
+				}
+			}
 
 			//signs
 
@@ -140,7 +192,7 @@ namespace Corruption.TEdit
 		}
 
 		//should we expose this publicly?
-		internal static void SendTileSquare(TSPlayer player, ref Rectangle rectangle )
+		internal static void SendTileUpdates(TSPlayer player, ref Rectangle rectangle )
 		{
 			//try to send update, using the pasted schematics center point, and radius
 			var updateX = rectangle.Center.X;
@@ -149,6 +201,13 @@ namespace Corruption.TEdit
 
 			TSPlayer.All.SendTileSquare(updateX, updateY, updateSize);
 			//TSPlayer.All.SendData(PacketTypes.TileSendSquare, "", updateSize, updateX, updateY, 0, 0);
+
+			//Debug.Print("Sending tile section...");
+			//Debug.Print($"{rectangle.X}, {rectangle.Y}, {rectangle.Width}, {rectangle.Height}");
+			
+			//TSPlayer.All.SendData(PacketTypes.TileSendSection, "", rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+
+			//TSPlayer.All.SendTileSquare(updateX, updateY, updateSize);
 		}
 	}
 }
