@@ -34,7 +34,7 @@ namespace Corruption.TEdit
 			var readRowStart = clippedRect.Top - y;
 
 			//clear existing chests
-			ItemFunctions.ClearChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
+			ChestFunctions.ClearChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
 			
 			//clear signs
 
@@ -69,13 +69,13 @@ namespace Corruption.TEdit
 				var chestStyle = tile.U / frameSize;
 				var chestX = x + chest.X;
 				var chestY = y + chest.Y + 1; // we have to add 1, because create chest uses an offset.
-				var chestId = ItemFunctions.CreateChest(chestX, chestY, chestStyle);
+				var chestId = ChestFunctions.CreateChest(chestX, chestY, chestStyle);
 				
 				if( chestId != -1 )
 				{
 					foreach(var item in chest.Items)
 					{
-						ItemFunctions.PutItemIntoChest(chestId, item.NetId, item.StackSize, item.Prefix);
+						ChestFunctions.PutItemIntoChest(chestId, item.NetId, item.StackSize, item.Prefix);
 					}
 				}
 				else
@@ -143,7 +143,7 @@ namespace Corruption.TEdit
 			}
 
 			//grab chests
-			var chestIds = ItemFunctions.FindChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
+			var chestIds = ChestFunctions.FindChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
 			foreach(var id in chestIds)
 			{
 				var srcChest = Main.chest[id];

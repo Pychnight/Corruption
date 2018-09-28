@@ -88,8 +88,6 @@ namespace Corruption.TEdit
 				
 				return null;
 			}
-			
-			return null;
 		}
 	}
 }

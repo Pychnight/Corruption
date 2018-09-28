@@ -15,11 +15,11 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
-	<PropertyGroup>
-		<RpgToolsPropsPath>..\..\RpgTools.props</RpgToolsPropsPath>
-		<RpgToolsTargetsPath>..\..\RpgTools.targets</RpgToolsTargetsPath>
-	</PropertyGroup>
-	<Import Project="$(RpgToolsPropsPath)" Condition="Exists('$(RpgToolsPropsPath)')" />
+  <PropertyGroup>
+    <RpgToolsPropsPath>..\..\RpgTools.props</RpgToolsPropsPath>
+    <RpgToolsTargetsPath>..\..\RpgTools.targets</RpgToolsTargetsPath>
+  </PropertyGroup>
+  <Import Project="$(RpgToolsPropsPath)" Condition="Exists('$(RpgToolsPropsPath)')" />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AreaFunctions.cs" />
+    <Compile Include="ChestFunctions.cs" />
     <Compile Include="EmoteFunctions.cs" />
     <Compile Include="PluginSupport\ColorHelpers.cs" />
     <Compile Include="ItemFunctions.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="PluginSupport\OutputExtensions.cs" />
     <Compile Include="PluginSupport\TileNameMap.cs" />
     <Compile Include="ProjectileFunctions.cs" />
+    <Compile Include="SignFunctions.cs" />
     <Compile Include="SignTypes.cs" />
     <Compile Include="TEdit\ITileExtensions.cs" />
     <Compile Include="TEdit\SchematicReaderV2.cs" />
@@ -130,5 +132,5 @@
     <!--<Error Condition="!Exists('..\..\AllPlugins\packages\MSBuild.Extension.Pack.1.9.1\build\net40\MSBuild.Extension.Pack.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\AllPlugins\packages\MSBuild.Extension.Pack.1.9.1\build\net40\MSBuild.Extension.Pack.targets'))" />-->
     <Error Condition="!Exists('..\..\packages\MSBuild.Extension.Pack.1.9.1\build\net40\MSBuild.Extension.Pack.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\MSBuild.Extension.Pack.1.9.1\build\net40\MSBuild.Extension.Pack.targets'))" />
   </Target>
-	<Import Project="$(RpgToolsTargetsPath)" Condition="Exists('$(RpgToolsTargetsPath)')" />
+  <Import Project="$(RpgToolsTargetsPath)" Condition="Exists('$(RpgToolsTargetsPath)')" />
 </Project>
