@@ -95,6 +95,11 @@ namespace Corruption
 
 		public static bool KillSign(int x, int y)
 		{
+			return KillSign(x, y, effectOnly: false, noItem: false);
+		}
+
+		public static bool KillSign(int x, int y, bool effectOnly, bool noItem)
+		{
 			//Terrarias built in kill sign func doesnt return status... lets roll our own version for debugging's sake.
 			//Sign.KillSign(x, y);
 
@@ -115,8 +120,7 @@ namespace Corruption
 			if(result)
 			{
 				//TileFunctions.KillTile(x, y);
-
-				WorldGen.KillTile(x, y);
+				WorldGen.KillTile(x, y, false, effectOnly, noItem);//effectOnly = we don't want items to be produced from this. 
 				TSPlayer.All.SendTileSquare(x, y, 3);
 			}
 
@@ -201,8 +205,9 @@ namespace Corruption
 		/// <param name="yMin"></param>
 		/// <param name="xMax"></param>
 		/// <param name="yMax"></param>
+		/// <param name="effectOnly"></param>
 		/// <returns>List of results, where all values > -1 are id's that were destroyed.</returns>
-		internal static List<int> ClearSigns(int xMin, int yMin, int xMax, int yMax)
+		internal static List<int> ClearSigns(int xMin, int yMin, int xMax, int yMax, bool effectOnly = true)
 		{
 			var results = FindSigns(xMin, yMin, xMax, yMax);
 
@@ -212,20 +217,13 @@ namespace Corruption
 				var sign = Main.sign[signId];
 
 				if( sign != null )
-				{
-					results[i] = KillSign(sign.x, sign.y) ? results[i] : -1;
-					//results[i] = signId;
-				}
+					results[i] = KillSign(sign.x, sign.y, effectOnly, noItem: true) ? results[i] : -1;
 				else
 					results[i] = -1;//we couldn't remove this sign, mark its id as failure/invalid.
 
-				Debug.Print($"ClearSigns: result[{i}] = {results[i]}");
+				//Debug.Print($"ClearSigns: result[{i}] = {results[i]}");
 			}
-
-			//DISREGARD BELOW FOR NOW... we use our own KillSign function now.
-			//this was grabbed from ChestFunctions.ClearChests, which returns id's that were destroyed. KillSign never gives us a result,
-			//so for now we just mark all signs we called kill on as successes.
-
+			
 			return results;
 		}
 	}

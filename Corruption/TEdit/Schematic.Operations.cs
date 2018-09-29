@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿#define SCHEMATIC_ENABLE_SIGNS //toggles signs in paste/grab operations ( sign cleanup is not working as expected currently...prob not sending right packets )
+
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,8 +37,11 @@ namespace Corruption.TEdit
 
 			//clear existing chests
 			ChestFunctions.ClearChests(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
-			
+
+#if SCHEMATIC_ENABLE_SIGNS
 			//clear signs
+			SignFunctions.ClearSigns(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom, effectOnly: true);
+#endif
 
 			//copy tiles
 			var readRow = readRowStart;
@@ -88,6 +93,23 @@ namespace Corruption.TEdit
 				//PacketType 34 should be PlaceChest, not TileKill. Sigh.
 				//TSPlayer.All.SendData(PacketTypes.TileKill, "", chestId, tileX, tileY, style, 0);//0 = ChestID to destroy, but we dont use this here..
 			}
+
+
+#if SCHEMATIC_ENABLE_SIGNS
+			//paste signs
+			foreach(var sign in Signs)
+			{
+				var signX = x + sign.X;
+				var signY = y + sign.Y;
+
+				var result = SignFunctions.TryCreateSignDirect(signX, signY, sign.Text);
+
+				if( result )
+					Debug.Print($"Pasted sign at {signX}, {signY}.");
+				else
+					Debug.Print($"Failed to paste sign at {signX}, {signY}.");
+			}
+#endif
 
 		}
 		
@@ -160,8 +182,28 @@ namespace Corruption.TEdit
 				}
 			}
 
-			//signs
 
+#if SCHEMATIC_ENABLE_SIGNS
+			//grab signs
+
+			var signIds = SignFunctions.FindSigns(clippedRect.Left, clippedRect.Top, clippedRect.Right, clippedRect.Bottom);
+			foreach(var id in signIds)
+			{
+				var srcSign = Main.sign[id];
+
+				if(srcSign!=null)
+				{
+					Corruption.TEdit.Sign dst = new Corruption.TEdit.Sign();
+
+					//we have to offset dst into coords that are relative to the schematic, not the world tileset.
+					dst.X = srcSign.x - x;
+					dst.Y = srcSign.y - y;
+					dst.Text = srcSign.text;
+
+					result.Signs.Add(dst);
+				}
+			}
+#endif
 			return result;
 		}
 
