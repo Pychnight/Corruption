@@ -17,14 +17,18 @@ namespace Corruption
 		/// <param name="name">The name, which must not be <c>null</c>.</param>
 		/// <returns>The region, or <c>null</c> if it does not exist.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="name" /> is <c>null</c>.</exception>
+		/// <exception cref="KeyNotFoundException"><paramref name="name" /> is an invalid region name.</exception>
 		public static Region GetRegion(string name)
 		{
 			if( name == null )
-			{
 				throw new ArgumentNullException(nameof(name));
-			}
+			
+			var result = TShock.Regions.GetRegionByName(name);
 
-			return TShock.Regions.GetRegionByName(name);
+			if( result == null )
+				throw new KeyNotFoundException($"Invalid Region '{name}'.");
+			else
+				return result;
 		}
 
 		// Utility public static bool for spawning when the player is around the region.
