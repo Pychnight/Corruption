@@ -13,7 +13,7 @@ namespace Corruption.PluginSupport
 	/// <summary>
 	/// Common base class for plugin configuration via json files. Provides a uniform means to load, save, and validate such files.
 	/// </summary>
-	public abstract class JsonConfig
+	public abstract class JsonConfig : IValidator
 	{
 		/// <summary>
 		/// Attempts to load a json configuration saved at the specified path. If none exists, one will be created. Also checks for configuration errors, by
@@ -25,31 +25,41 @@ namespace Corruption.PluginSupport
 		/// <returns></returns>
 		public static TConfig LoadOrCreate<TConfig>(TerrariaPlugin plugin, string filePath) where TConfig : JsonConfig, new()
 		{
-			TConfig result = default(TConfig);
-
+			TConfig config = default(TConfig);
+			
 			try
 			{
 				Directory.CreateDirectory(Path.GetDirectoryName(filePath));
 
 				if( File.Exists(filePath) )
 				{
+					ServerApi.LogWriter.PluginWriteLine(plugin, $"Loading config from {filePath} ...", TraceLevel.Info);
 					var json = File.ReadAllText(filePath);
-					result = JsonConvert.DeserializeObject<TConfig>(json);
+					config = JsonConvert.DeserializeObject<TConfig>(json);
 				}
 				else
 				{
-					result = new TConfig();
-					Save(plugin, result, filePath);
+					ServerApi.LogWriter.PluginWriteLine(plugin, $"Creating config at {filePath} ...", TraceLevel.Info);
+					config = new TConfig();
+					Save(plugin, config, filePath);
 				}
 
-				result.Validate();
+				var validationResult = config.Validate();
+				ServerApi.LogWriter.PluginWriteLine(plugin, $"Validated config. Found {validationResult.Errors.Count} Errors, {validationResult.Warnings.Count} Warnings.", TraceLevel.Info);
+
+				foreach (var err in validationResult.Errors)
+					ServerApi.LogWriter.PluginWriteLine(plugin, err.ToString(), TraceLevel.Error);
+
+				foreach (var warn in validationResult.Warnings)
+					ServerApi.LogWriter.PluginWriteLine(plugin, warn.ToString(), TraceLevel.Warning);
+
 			}
 			catch( Exception ex )
 			{
 				ServerApi.LogWriter.PluginWriteLine(plugin, ex.Message, TraceLevel.Error);
 			}
 
-			return result;
+			return config;
 		}
 
 		/// <summary>
@@ -85,8 +95,9 @@ namespace Corruption.PluginSupport
 		/// JsonConfig types should override this method, and throw for any configuration errors discovered.
 		/// LoadOrCreate() runs this method to inform the server administrator of any issues.
 		/// </summary>
-		public virtual void Validate()
+		public virtual ValidationResult Validate()
 		{
+			return new ValidationResult();
 		}
 	}
 }

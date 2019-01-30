@@ -11,46 +11,20 @@ namespace Corruption.PluginSupport
 	/// </summary>
 	public class ValidationResult
 	{
-		List<ValidationResultItem> errors;
-		List<ValidationResultItem> warnings;
+		List<ValidationError> errors;
+		List<ValidationWarning> warnings;
 
-		public IList<ValidationResultItem> Errors { get; private set; }
-		public IList<ValidationResultItem> Warnings { get; private set; }
-
+		public IList<ValidationError> Errors => errors;
+		public IList<ValidationWarning> Warnings => warnings;
 		public bool HasErrors => Errors.Count > 0;
 		public bool HasWarnings => Warnings.Count > 0;
 
 		public ValidationResult()
 		{
-			errors = new List<ValidationResultItem>();
-			warnings = new List<ValidationResultItem>();
-
-			Errors = errors.AsReadOnly();
-			Warnings = warnings.AsReadOnly();
+			errors = new List<ValidationError>();
+			warnings = new List<ValidationWarning>();
 		}
-
-		public void AddError(string message = "", string source = "", string location = "")
-		{
-			var item = new ValidationResultItem(message, source, location);
-			errors.Add(item);
-		}
-
-		public void AddError(string message, string source, int line, int col)
-		{
-			AddError(message, source,$"[{line},{col}]");
-		}
-
-		public void AddWarning(string message = "", string source = "", string location = "")
-		{
-			var item = new ValidationResultItem(message, source, location);
-			warnings.Add(item);
-		}
-
-		public void AddWarning(string message, string source, int line, int col)
-		{
-			AddWarning(message, source, $"[{line},{col}]");
-		}
-
+		
 		/// <summary>
 		/// Appends errors and warnings from another ValidationResult.
 		/// </summary>
