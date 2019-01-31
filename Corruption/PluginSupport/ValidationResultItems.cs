@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Corruption.PluginSupport
 {
 	/// <summary>
-	/// Base class for errors, warnings, or info within a ValidationResult.
+	/// Base class for errors, warnings, or other info within a <see cref="ValidationResult"/>.
 	/// </summary>
 	public abstract class ValidationResultItem
 	{

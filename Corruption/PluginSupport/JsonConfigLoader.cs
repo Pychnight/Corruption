@@ -44,15 +44,16 @@ namespace Corruption.PluginSupport
 					Save(plugin, config, filePath);
 				}
 
+				int errors = 0, warnings = 0;
 				var validationResult = config.Validate();
-				ServerApi.LogWriter.PluginWriteLine(plugin, $"Validated config. Found {validationResult.Errors.Count} Errors, {validationResult.Warnings.Count} Warnings.", TraceLevel.Info);
 
-				foreach (var err in validationResult.Errors)
-					ServerApi.LogWriter.PluginWriteLine(plugin, err.ToString(), TraceLevel.Error);
-
-				foreach (var warn in validationResult.Warnings)
-					ServerApi.LogWriter.PluginWriteLine(plugin, warn.ToString(), TraceLevel.Warning);
-
+				validationResult.Source = $"config file {filePath}.";
+				validationResult.GetTotals(ref errors, ref warnings);
+				
+				if( errors > 0 || warnings > 0)
+				{
+					plugin.LogPrint(validationResult);
+				}
 			}
 			catch( Exception ex )
 			{
