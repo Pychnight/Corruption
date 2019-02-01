@@ -72,6 +72,7 @@
     <Compile Include="NpcFunctions.cs" />
     <Compile Include="PlayerCommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
+    <Compile Include="PluginSupport\DatabaseConfig.cs" />
     <Compile Include="PluginSupport\OutputExtensions.cs" />
     <Compile Include="PluginSupport\TileNameMap.cs" />
     <Compile Include="ProjectileFunctions.cs" />
@@ -110,9 +111,6 @@
     <Compile Include="TimeFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Corruption.nuspec">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
