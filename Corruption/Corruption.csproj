@@ -70,7 +70,7 @@
     <Compile Include="ItemFunctions.cs" />
     <Compile Include="ItemPrefix.cs" />
     <Compile Include="NpcFunctions.cs" />
-    <Compile Include="PlayerCommandFunctions.cs" />
+    <Compile Include="CommandFunctions.cs" />
     <Compile Include="PlayerFunctions.cs" />
     <Compile Include="PluginSupport\DatabaseConfig.cs" />
     <Compile Include="PluginSupport\OutputExtensions.cs" />
