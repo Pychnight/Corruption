@@ -6,12 +6,80 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using TShockAPI;
 using TShockAPI.Localization;
 
 namespace Corruption
 {
 	public static class NpcFunctions
 	{
+		/// <summary>
+		///     Spawns the mob with the specified name, coordinates, and amount.
+		/// </summary>
+		/// <param name="nameOrType">The name or type, which must be a valid NPC name or type and not <c>null</c>.</param>
+		/// <param name="x">The X coordinate.</param>
+		/// <param name="y">The Y coordinate.</param>
+		/// <param name="radius">The radius, which must be positive.</param>
+		/// <param name="amount">The amount, which must be positive.</param>
+		/// <returns>The spawned NPCs.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="nameOrType" /> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">
+		///     Either <paramref name="radius" /> or <paramref name="amount" /> is not positive.
+		/// </exception>
+		/// <exception cref="FormatException"><paramref name="nameOrType" /> is not a valid NPC name.</exception>
+		public static NPC[] SpawnNpc(string nameOrType, int x, int y, int radius, int amount)
+		{
+			if (nameOrType == null)
+				throw new ArgumentNullException(nameof(nameOrType));
+
+			var npcId = GetNpcIdFromNameOrType(nameOrType);
+			if (npcId == null)
+				throw new FormatException($"Invalid NPC name '{nameOrType}'.");
+
+			return SpawnNpc((int)npcId, x, y, radius, amount);
+		}
+
+		[Obsolete("Use SpawnNpc(nameOrType,x,y,radius,amount) instead.")]
+		public static NPC[] SpawnMob(string nameOrType, int x, int y, int radius = 10, int amount = 1) => SpawnNpc(nameOrType,x,y,radius,amount);
+
+		/// <summary>
+		///     Spawns the NPC with the specified name, coordinates, and amount.
+		/// </summary>
+		/// <param name="type">The type, which must be a valid NPC type.</param>
+		/// <param name="x">The X coordinate.</param>
+		/// <param name="y">The Y coordinate.</param>
+		/// <param name="radius">The radius, which must be positive.</param>
+		/// <param name="amount">The amount, which must be positive.</param>
+		/// <returns>The spawned NPCs.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">
+		///     Either <paramref name="radius" /> or <paramref name="amount" /> is not positive.
+		/// </exception>
+		/// <exception cref="FormatException"><paramref name="name" /> is not a valid NPC name.</exception>
+		public static NPC[] SpawnNpc(int type, int x, int y, int radius, int amount)
+		{
+			if (radius <= 0)
+				throw new ArgumentOutOfRangeException(nameof(radius), "Radius must be positive.");
+
+			if (amount <= 0)
+				throw new ArgumentOutOfRangeException(nameof(amount), "Amount must be positive.");
+
+			var npcs = new List<NPC>();
+			for (var i = 0; i < amount; ++i)
+			{
+				TShock.Utils.GetRandomClearTileWithInRange(x, y, radius, radius, out var spawnX, out var spawnY);
+				var npcIndex = NPC.NewNPC(16 * spawnX, 16 * spawnY, type);
+				if (npcIndex != Main.maxNPCs)
+				{
+					npcs.Add(Main.npc[npcIndex]);
+				}
+			}
+			return npcs.ToArray();
+		}
+
+		[Obsolete("Use SpawnNpc(type,x,y,radius,amount) instead.")]
+		public static NPC[] SpawnMob(int type, int x, int y, int radius = 10, int amount = 1) => SpawnNpc(type, x, y, radius, amount);
+		
+
 #if USE_FAST_ID_LOOKUP
 
 		static Dictionary<string, int> npcNameToId;
