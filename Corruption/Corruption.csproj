@@ -66,6 +66,7 @@
     <Compile Include="AreaFunctions.cs" />
     <Compile Include="ChestFunctions.cs" />
     <Compile Include="EmoteFunctions.cs" />
+    <Compile Include="MiscFunctions.cs" />
     <Compile Include="PluginSupport\ColorHelpers.cs" />
     <Compile Include="ItemFunctions.cs" />
     <Compile Include="ItemPrefix.cs" />
