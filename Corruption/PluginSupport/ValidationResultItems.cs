@@ -11,27 +11,23 @@ namespace Corruption.PluginSupport
 	/// </summary>
 	public abstract class ValidationResultItem
 	{
+		public ValidationResult Parent { get; internal set; }
 		public string Message { get; set; }
-		public string Source { get; set; }
-		public int Line { get; set; } = -1;
-		public int Column { get; set; } = -1;
-		
+		public object Source { get; set; }
+
 		public override string ToString()
 		{
 			var sb = new StringBuilder();
+			var src = Source;
 
-			if( !string.IsNullOrWhiteSpace(Source) )
-			{
-				sb.Append(Source);
-				sb.Append(" ");
-			}
+			//if we dont have a specific source set, try to grab a source from Parent.
+			if(src==null)
+				src = Parent?.Source;
 			
-			if (Line>-1)
+			if(src!=null)
 			{
-				if( Column > -1 )
-					sb.Append($"[{Line},{Column}]");
-				else
-					sb.Append($"[{Line}]");
+				sb.Append(src.ToString());
+				sb.Append(": ");
 			}
 			
 			if ( !string.IsNullOrWhiteSpace(Message) )
@@ -48,7 +44,7 @@ namespace Corruption.PluginSupport
 	public class ValidationWarning : ValidationResultItem
 	{
 		public ValidationWarning() { }
-		public ValidationWarning(string message, string source = "", int row = -1, int column = -1)
+		public ValidationWarning(string message, string source = null)
 		{
 			Message = message;
 			Source = source;
@@ -58,7 +54,7 @@ namespace Corruption.PluginSupport
 	public class ValidationError : ValidationResultItem
 	{
 		public ValidationError() { }
-		public ValidationError(string message, string source = "", int row = -1, int column = -1)
+		public ValidationError(string message, string source = null)
 		{
 			Message = message;
 			Source = source;

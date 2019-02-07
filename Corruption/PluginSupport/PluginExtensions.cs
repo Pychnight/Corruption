@@ -38,6 +38,9 @@ namespace Corruption.PluginSupport
 			int errors = 0;
 
 			validationResult.GetTotals(ref errors, ref warnings);
+
+			if (warnings == 0 && errors == 0)
+				return;
 						
 			if (warnings>0)
 				traceLevel = TraceLevel.Warning;
@@ -45,11 +48,9 @@ namespace Corruption.PluginSupport
 			if (errors>0)
 				traceLevel = TraceLevel.Error;
 
-			if(!string.IsNullOrWhiteSpace(validationResult.Source))
-			{
-				endPart = $" in {validationResult.Source}.";
-			}
-			
+			if(validationResult.Source!=null)
+				endPart = $" in {validationResult.Source.ToString()}.";
+						
 			plugin.LogPrint($"Found {errors} Errors, {warnings} Warnings{endPart}", traceLevel);
 
 			RecurseLogPrintValidationResult(plugin, validationResult);
@@ -59,11 +60,11 @@ namespace Corruption.PluginSupport
 		{
 			foreach (var err in validationResult.Errors)
 				plugin.LogPrint(err.ToString(), TraceLevel.Error);
-
+			
 			foreach (var warn in validationResult.Warnings)
 				plugin.LogPrint(warn.ToString(), TraceLevel.Warning);
-
-			foreach (var ch in validationResult.ChildResults)
+			
+			foreach (var ch in validationResult.Children)
 				RecurseLogPrintValidationResult(plugin, ch);
 		}
 	}

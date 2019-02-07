@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,22 +12,18 @@ namespace Corruption.PluginSupport
 	/// </summary>
 	public class ValidationResult
 	{
-		List<ValidationError> errors;
-		List<ValidationWarning> warnings;
-		List<ValidationResult> childResults;
-
 		/// <summary>
-		/// Gets an IList of ValidationErrors.
+		/// Gets a List of ValidationErrors.
 		/// </summary>
-		public IList<ValidationError> Errors => errors;
+		public IList<ValidationError> Errors { get; private set; }
 		/// <summary>
-		/// Gets an IList of ValidationWarnings.
+		/// Gets a List of ValidationWarnings.
 		/// </summary>
-		public IList<ValidationWarning> Warnings => warnings;
+		public IList<ValidationWarning> Warnings { get; private set; }
 		/// <summary>
-		/// Gets an IList of ValidationResults, from any sub objects.  
+		/// Gets a List of ValidationResults, from any sub objects.  
 		/// </summary>
-		public IList<ValidationResult> ChildResults => childResults;
+		public IList<ValidationResult> Children { get; private set; }
 		/// <summary>
 		/// Gets a value determining if <see cref="Errors"/> contains any <see cref="ValidationError"/>s.
 		/// </summary>
@@ -38,52 +35,53 @@ namespace Corruption.PluginSupport
 		/// <summary>
 		/// Gets a value determining if this ValidationResult has any child results.
 		/// </summary>
-		public bool HasChildResults => ChildResults.Count > 0;
+		public bool HasChildResults => Children.Count > 0;
 		/// <summary>
-		/// Gets or sets an optional information string that refers to the origin of this <see cref="ValidationResult" />. 
+		/// Gets or sets an optional object that refers to the origin of this <see cref="ValidationResult" />. 
 		/// </summary>
-		/// <remarks>Source may refer to a file name, or an object, or some other contextual hint.</remarks>
-		public string Source { get; set; }
+		/// <remarks>Source may refer to a file name, or an object, or some other contextual hint. For outputting purposes, Source.ToString()
+		/// would typically used.</remarks>
+		public object Source { get; set; }
 
-		public ValidationResult()
+		public ValidationResult() : this(null) { }
+
+		public ValidationResult(object source)
 		{
-			errors = new List<ValidationError>();
-			warnings = new List<ValidationWarning>();
-			childResults = new List<ValidationResult>();
+			Errors = new ValidationResultItemCollection<ValidationError>(this);
+			Warnings = new ValidationResultItemCollection<ValidationWarning>(this);
+			Children = new List<ValidationResult>();
+			Source = source;
 		}
 		
-		/// <summary>
-		/// Appends errors and warnings from another <see cref="ValidationResult"/>.
-		/// </summary>
-		/// <param name="result">ValidationResult to copy items from.</param>
-		/// <param name="copyErrors">True to append errors.</param>
-		/// <param name="copyWarnings">True to append warnings.</param>
-		public void Concat(ValidationResult result, bool copyErrors = true, bool copyWarnings = true)
-		{
-			if(copyErrors)
-				errors.AddRange(result.Errors);
-			
-			if(copyWarnings)	
-				warnings.AddRange(result.Warnings);
-		}
-
 		/// <summary>
 		/// Set all warnings and errors to a new source.
 		/// </summary>
 		/// <param name="source">New source.</param>
 		/// <param name="setErrors">True to set error sources.</param>
 		/// <param name="setWarnings">True to set warning sources.</param>
-		public void SetSources(string source, bool setErrors = true, bool setWarnings = true)
+		public void SetSources(string source, bool setErrors = true, bool setWarnings = true, bool setChildren = false )
 		{
 			if(setErrors)
-				errors.ForEach(i => i.Source = source);
+			{
+				foreach(var i in Errors)
+					i.Source = source;
+			}
 
-			if( setWarnings )
-				warnings.ForEach(i => i.Source = source);
+			if(setWarnings)
+			{
+				foreach(var i in Warnings)
+					i.Source = source;
+			}
+
+			if(setChildren)
+			{
+				foreach (var child in Children)
+					child.SetSources(source, setErrors, setWarnings, setChildren);
+			}
 		}
 
 		/// <summary>
-		/// Recursively sums all errors and warnings for this <see cref="ValidationResult"/>, and all <see cref="ChildResults"/>.
+		/// Recursively sums all errors and warnings for this <see cref="ValidationResult"/>, and all <see cref="Children"/>.
 		/// </summary>
 		/// <param name="totalErrors"></param>
 		/// <param name="totalWarnings"></param>
@@ -92,8 +90,35 @@ namespace Corruption.PluginSupport
 			totalErrors += Errors.Count;
 			totalWarnings += Warnings.Count;
 
-			foreach(var child in ChildResults)
+			foreach(var child in Children)
 				child.GetTotals(ref totalErrors, ref totalWarnings);
+		}
+
+		/// <summary>
+		/// Custom collection that sets/unsets the Parent <see cref="ValidationResult" /> for items.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		private class ValidationResultItemCollection<T> : Collection<T> where T : ValidationResultItem
+		{
+			ValidationResult parent;
+
+			internal ValidationResultItemCollection(ValidationResult parent)
+			{
+				this.parent = parent;
+			}
+
+			protected override void InsertItem(int index, T item)
+			{
+				base.InsertItem(index, item);
+				item.Parent = parent;
+			}
+
+			protected override void RemoveItem(int index)
+			{
+				var item = this[index];
+				item.Parent = null;
+				base.RemoveItem(index);
+			}
 		}
 	}
 }
