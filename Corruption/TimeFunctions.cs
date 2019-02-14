@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Terraria;
 
 namespace Corruption
 {
+	/// <summary>
+	/// Provides methods for checking Terraria time and events. Also includes methods for delaying execution.  
+	/// </summary>
 	public static class TimeFunctions
 	{
 		// Utility function for spawning or replacing after any mechanical boss is defeated.
@@ -135,6 +139,44 @@ namespace Corruption
 		public static bool DuringSlimeRain()
 		{
 			return Main.slimeRain;
+		}
+
+		/// <summary>
+		/// Pauses execution for the specified duration.
+		/// </summary>
+		/// <param name="milliseconds"></param>
+		public static void Delay(int milliseconds)
+		{
+			Task.Delay(milliseconds).Wait();
+		}
+
+		/// <summary>
+		/// Pauses execution for the specified duration.
+		/// </summary>
+		/// <param name="timeSpan"></param>
+		public static void Delay(TimeSpan timeSpan)
+		{
+			Task.Delay(timeSpan).Wait();
+		}
+		
+		/// <summary>
+		/// Pauses execution for the specified duration, using a <see cref="CancellationToken" />.
+		/// </summary>
+		/// <param name="milliseconds"></param>
+		/// <param name="cancellationToken"></param>
+		public static void Delay(int milliseconds, CancellationToken cancellationToken )
+		{
+			Task.Delay(milliseconds, cancellationToken).Wait();
+		}
+
+		/// <summary>
+		/// Pauses execution for the specified duration, using a <see cref="CancellationToken" />.
+		/// </summary>
+		/// <param name="timeSpan"></param>
+		/// <param name="cancellationToken"></param>
+		public static void Delay(TimeSpan timeSpan, CancellationToken cancellationToken)
+		{
+			Task.Delay(timeSpan, cancellationToken).Wait();
 		}
 	}
 }
